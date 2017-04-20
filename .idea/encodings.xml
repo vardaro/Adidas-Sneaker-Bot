@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/../SelfieBot/src/main/resources/user.properties" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/log4j.properties" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/me.properties" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/twitter4j.properties" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/user.properties" charset="UTF-8" />
     <file url="file://$USER_HOME$/SelfieListener/tlbReddit/src/main/resources/user.properties" charset="UTF-8" />

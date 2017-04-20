@@ -4,6 +4,8 @@ import java.util.Properties;
 
 /**
  * Created by justa on 4/18/2017.
+ *
+ * This class simple reads in the user properties of a user
  */
 public class PropertiesReader {
   Properties properties = new Properties();
