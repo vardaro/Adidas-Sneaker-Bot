@@ -23,11 +23,10 @@ hs_err_pid*
 
 # Property files
 *.properties
-!me.properties
 
 .idea/vcs.xml
 .idea/workspace.xml
-Tweets/
-src/main/resources/
 src/test/
 target/
+!/src/main/resources/adidas.properties
+!/src/main/resources/log4j.properties
