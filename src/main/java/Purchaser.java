@@ -1,10 +1,7 @@
 import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * Created by justa on 4/20/2017.
@@ -19,85 +16,86 @@ class Purchaser {
   // JavaScript function stored in string
   // Called in JavascriptExecutor
   private static final String jsScrollFunction = "arguments[0].scrollIntoView(true);";
+
   private static PropertiesReader user = new PropertiesReader("user.properties");
   private static PropertiesReader form = new PropertiesReader("adidas.properties");
   private static WebDriver driver = new ChromeDriver();
-  private static WebDriverWait wait = new WebDriverWait(driver, 10);
   private static String purchaseTxt = "C:\\Users\\justa\\IdeaProjects\\SneakerBot\\Purchase History.txt";
 
   /**
    * Fills out the checkout form
+   *
    * @param url url of the shoe being bought
    */
   static void buyShoe(String url) {
 
-        try {
-          // To prevent buying the shoe again
-          if (notCopped(url)) {
-            // Go to webpage
-            driver.get(url);
-            //driver.get("http://www.adidas.com/us/alphabounce-reigning-champ-shoes/CG4301.html");
+    try {
+      // To prevent buying the shoe again
+      if (notCopped(url)) {
+        // Go to webpage
+        driver.get(url);
+        //driver.get("http://www.adidas.com/us/alphabounce-reigning-champ-shoes/CG4301.html");
 
-            executePossibleDropdown("DropdownInstructions", "ShoeSize", "SizeSelectionIsDropdown");
+        executePossibleDropdown("DropdownInstructions", "ShoeSize", "SizeSelectionIsDropdown");
 
-            executePossibleDropdown("QuantityInstructions", "Quantity", "QuantitySelectionIsDropdown");
+        executePossibleDropdown("QuantityInstructions", "Quantity", "QuantitySelectionIsDropdown");
 
-            captcha();
+        captcha();
 
-            xpathClick(form.get("AddToCart"));
-            Thread.sleep(1500);
-            xpathClick(form.get("Checkout"));
-            Thread.sleep(1500);
-
-
-            // If they prompt login
-            if (driver.getCurrentUrl().equals("https://www.adidas.com/us/checkout-start")) {
-              driver.findElement(By.xpath("//*[@id=\"frameContainer\"]/div[2]/form/div/button")).click();
-            }
-
-            xpathFill(form.get("FirstName"), user.get("FirstName"));
-            xpathFill(form.get("LastName"), user.get("LastName"));
-            xpathFill(form.get("Address"), user.get("Address"));
-            xpathFill(form.get("PhoneNumber"), user.get("PhoneNumber"));
-            xpathFill(form.get("Email"), user.get("Email"));
-            xpathFill(form.get("City"), user.get("City"));
-            xpathFill(form.get("ZipCode"), user.get("ZipCode"));
-
-            executePossibleDropdown("StateInstructions", "State", "StateIsDropdown");
-
-            // Billing info
-            xpathClick("//*[@id=\"dwfrm_delivery\"]/div[2]/div[2]/div/fieldset/div/div[2]/div/div/span");
-            xpathFill(form.get("BillingFirstName"), user.get("BillingFirstName"));
-            xpathFill(form.get("BillingLastName"), user.get("BillingLastName"));
-            xpathFill(form.get("BillingAddress"),user.get("BillingAddress"));
-            xpathFill(form.get("BillingCity"),user.get("BillingCity"));
-            xpathFill(form.get("BillingZipCode"),user.get("BillingZipCode"));
-            xpathFill(form.get("BillingPhoneNumber"),user.get("BillingPhoneNumber"));
-
-            executePossibleDropdown("BillingStateInstructions", "State", "BillingStateIsDropdown");
+        xpathClick(form.get("AddToCart"));
+        Thread.sleep(1500);
+        xpathClick(form.get("Checkout"));
+        Thread.sleep(1500);
 
 
-            xpathClick(form.get("ReviewAndPay"));
-            Thread.sleep(3000);
-
-            // checkout info
-            xpathFill(form.get("CardNumber"), user.get("CardNumber"));
-            xpathFill(form.get("SecurityCode"), user.get("CardSecurityCode"));
-
-            executePossibleDropdown("CardMonthInstructions", "ExpirationMonthNumber", "CardMonthIsDropdown");
-
-            executePossibleDropdown("CardYearInstructions", "ExpirationYearNumber", "CardYearIsDropdown");
-
-            xpathClick(form.get("PlaceOrderButton"));
-            recordPurchase(url);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-          System.out.println("FUCK.");
-          System.out.println("Trying again...");
-          buyShoe(url);
+        // If they prompt login
+        if (driver.getCurrentUrl().equals("https://www.adidas.com/us/checkout-start")) {
+          driver.findElement(By.xpath("//*[@id=\"frameContainer\"]/div[2]/form/div/button")).click();
         }
-    System.out.println("Purchase Complete");
+
+        xpathFill(form.get("FirstName"), user.get("FirstName"));
+        xpathFill(form.get("LastName"), user.get("LastName"));
+        xpathFill(form.get("Address"), user.get("Address"));
+        xpathFill(form.get("PhoneNumber"), user.get("PhoneNumber"));
+        xpathFill(form.get("Email"), user.get("Email"));
+        xpathFill(form.get("City"), user.get("City"));
+        xpathFill(form.get("ZipCode"), user.get("ZipCode"));
+
+        executePossibleDropdown("StateInstructions", "State", "StateIsDropdown");
+
+        // Billing info
+        xpathClick("//*[@id=\"dwfrm_delivery\"]/div[2]/div[2]/div/fieldset/div/div[2]/div/div/span");
+        xpathFill(form.get("BillingFirstName"), user.get("BillingFirstName"));
+        xpathFill(form.get("BillingLastName"), user.get("BillingLastName"));
+        xpathFill(form.get("BillingAddress"), user.get("BillingAddress"));
+        xpathFill(form.get("BillingCity"), user.get("BillingCity"));
+        xpathFill(form.get("BillingZipCode"), user.get("BillingZipCode"));
+        xpathFill(form.get("BillingPhoneNumber"), user.get("BillingPhoneNumber"));
+
+        executePossibleDropdown("BillingStateInstructions", "State", "BillingStateIsDropdown");
+
+
+        xpathClick(form.get("ReviewAndPay"));
+        Thread.sleep(3000);
+
+        // checkout info
+        xpathFill(form.get("CardNumber"), user.get("CardNumber"));
+        xpathFill(form.get("SecurityCode"), user.get("CardSecurityCode"));
+
+        executePossibleDropdown("CardMonthInstructions", "ExpirationMonthNumber", "CardMonthIsDropdown");
+
+        executePossibleDropdown("CardYearInstructions", "ExpirationYearNumber", "CardYearIsDropdown");
+
+        xpathClick(form.get("PlaceOrderButton"));
+        System.out.println("Purchase complete\nLink: " + driver.getCurrentUrl());
+        recordPurchase(url);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("FUCK.");
+      System.out.println("Trying again...");
+      buyShoe(url);
+    }
   }
 
   /**
@@ -122,12 +120,13 @@ class Purchaser {
   private static void xpathClick(String elementToClick) {
     WebElement element = driver.findElement(By.xpath(elementToClick));
     if (!element.isDisplayed() && !element.isEnabled()) {
-      //JavascriptExecutor je = (JavascriptExecutor) driver;
-      //je.executeScript(jsScrollFunction, element);
+      JavascriptExecutor je = (JavascriptExecutor) driver;
+      je.executeScript(jsScrollFunction, element);
     }
     element.click();
     System.out.println(elementToClick + " clicked");
   }
+
   /**
    * Method made specifically for dropdown menus
    * <p>
@@ -178,24 +177,25 @@ class Purchaser {
    * the url will be written to this file
    * to exit the while() loop in the buyShoe()
    * method. This will prevent duplicates
+   *
    * @param url url of shoe
    */
   private static void recordPurchase(String url) {
     // Establish PrintWriter
     PrintWriter out = null;
     try {
-      out = new PrintWriter(new BufferedWriter(new FileWriter(purchaseTxt,true)));
+      out = new PrintWriter(new BufferedWriter(new FileWriter(purchaseTxt, true)));
     } catch (Exception e) {
       e.printStackTrace();
     }
     // Write url to file
     out.println(url);
-    System.out.println("Record saved " + url);
+    System.out.println("\nRecord saved " + url);
     out.close();
   }
 
   /**
-   * This method will exit the while() loop
+   * This method will exit the while loop
    *
    * @param url url of the shoe
    * @return whether the shoe url has been written to the file
@@ -203,14 +203,14 @@ class Purchaser {
   private static Boolean notCopped(String url) {
     System.out.println("url = " + url);
     try {
-      //
+      // Read in file and check for a match
       BufferedReader br = new BufferedReader(new FileReader(purchaseTxt));
       String inline;
       while ((inline = br.readLine()) != null) {
         System.out.println("inline = " + inline);
 
-        System.out.println("Code here is being run");
         if (inline.equals(url)) {
+          // A match was found meaning the user already purcahses
           System.out.println("Shoe owned");
           return false;
         }
@@ -219,25 +219,36 @@ class Purchaser {
       return true;
     } catch (Exception e) {
       e.printStackTrace();
-      return notCopped(url);
+      return false;
     }
   }
-  private static void captcha() {
-    System.out.println("\nChecking for captcha...");
-    try {
-      driver.findElement(By.xpath(form.get("Captcha"))).click();
-      System.out.println("Captcha found!");
 
-      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-      System.out.println("\nSolve the reCaptcha on the webpage" +
-        "\nType 'c' in the console once completed");
-      if (br.readLine().equals("c")) {
-        System.out.println("Captcha solved!\nContinuing checkout...");
+  /**
+   * Checks if a reCaptcha exists on the webpage
+   * if there is a captcha it will wait until the
+   * user to solve it and user input
+   */
+  private static void captcha() {
+    try {
+      System.out.println("\nChecking for captcha...");
+      if (!driver.findElements(By.xpath(form.get("Captcha"))).isEmpty()) {
+        // Element exists
+        System.out.println("Captcha found!");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("\nSolve the reCaptcha on the webpage" +
+          "\nType anything in the console once completed");
+
+        // Wait for user to finish captcha and provide user input
+        if (br.readLine() != null) {
+          System.out.println("Captcha solved!\nContinuing checkout...");
+        }
+      } else {
+        System.out.println("\nNo reCaptcha found");
       }
-    } catch (NoSuchElementException nsee) {
-      System.out.println("\nNo reCaptcha detected\nContinuing checkout");
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 }
+
+

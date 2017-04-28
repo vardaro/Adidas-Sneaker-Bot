@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
  * http://www.adidas.com/us/pureboost-shoes/BA8898.html
  *
  * http://www.adidas.com/us/nmd_xr1-primeknit-shoes/BA7215.html
+ *
+ * http://www.adidas.com/us/superstar-boost-shoes/BB0191.html
  */
 
 public class Main {
