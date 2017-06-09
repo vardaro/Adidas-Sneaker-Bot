@@ -7,11 +7,8 @@ import java.io.*;
  * Created by justa on 4/20/2017.
  * <p>
  * Buys shoe with selenium
- * TODO: do while loop
- * TODO: make execute dropdown decision method implrment
+ *
  */
-
-//http://www.adidas.com/us/alphabounce-reigning-champ-shoes/CG4301.html
 class Purchaser {
   // JavaScript function stored in string
   // Called in JavascriptExecutor
@@ -20,38 +17,34 @@ class Purchaser {
   private static PropertiesReader user = new PropertiesReader("user.properties");
   private static PropertiesReader form = new PropertiesReader("adidas.properties");
   private static WebDriver driver = new ChromeDriver();
-  private static String purchaseTxt = "C:\\Users\\justa\\IdeaProjects\\SneakerBot\\Purchase History.txt";
+  private static String purchaseTxt = "Purchase History.txt";
 
   /**
    * Fills out the checkout form
    *
    * @param url url of the shoe being bought
    */
-  static void buyShoe(String url) {
+  static void buyShoe(final String url) {
 
     try {
       // To prevent buying the shoe again
       if (notCopped(url)) {
         // Go to webpage
         driver.get(url);
-        //driver.get("http://www.adidas.com/us/alphabounce-reigning-champ-shoes/CG4301.html");
 
         executePossibleDropdown("DropdownInstructions", "ShoeSize", "SizeSelectionIsDropdown");
 
         executePossibleDropdown("QuantityInstructions", "Quantity", "QuantitySelectionIsDropdown");
 
-        captcha();
-
+        Thread.sleep(1000);
         xpathClick(form.get("AddToCart"));
         Thread.sleep(1500);
         xpathClick(form.get("Checkout"));
-        Thread.sleep(1500);
+        Thread.sleep(2000);
 
+        proceedAsGuest();
 
-        // If they prompt login
-        if (driver.getCurrentUrl().equals("https://www.adidas.com/us/checkout-start")) {
-          driver.findElement(By.xpath("//*[@id=\"frameContainer\"]/div[2]/form/div/button")).click();
-        }
+        xpathClick(form.get("Shipping"));
 
         xpathFill(form.get("FirstName"), user.get("FirstName"));
         xpathFill(form.get("LastName"), user.get("LastName"));
@@ -62,6 +55,7 @@ class Purchaser {
         xpathFill(form.get("ZipCode"), user.get("ZipCode"));
 
         executePossibleDropdown("StateInstructions", "State", "StateIsDropdown");
+
 
         // Billing info
         xpathClick("//*[@id=\"dwfrm_delivery\"]/div[2]/div[2]/div/fieldset/div/div[2]/div/div/span");
@@ -92,9 +86,7 @@ class Purchaser {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("FUCK.");
       System.out.println("Trying again...");
-      buyShoe(url);
     }
   }
 
@@ -119,6 +111,8 @@ class Purchaser {
    */
   private static void xpathClick(String elementToClick) {
     WebElement element = driver.findElement(By.xpath(elementToClick));
+
+    // Scroll element into view if not clickable
     if (!element.isDisplayed() && !element.isEnabled()) {
       JavascriptExecutor je = (JavascriptExecutor) driver;
       je.executeScript(jsScrollFunction, element);
@@ -146,16 +140,41 @@ class Purchaser {
   private static void executePossibleDropdown(String instructionsProperty, String innerTextToSelect, String isDropdownProperty) {
     JavascriptExecutor je = (JavascriptExecutor) driver;
     WebElement element;
-    // Dropdowns require an unpredictable amount of clicks
+
+    // Dropdowns require an unpredictable amount of clicks (typically two)
     // This will loop through each xpath in the corresponding
     // properties file and click it
     System.out.println("Handling " + instructionsProperty + " dropdown");
-    if (Boolean.parseBoolean(form.get(isDropdownProperty))) {
 
-      String[] xpathInstructions = form.get(instructionsProperty).split("&");
+    if (Boolean.parseBoolean(form.get(isDropdownProperty))) {
+      // A dropdown is present
+      // Every dropdown requires x amount of clicks to complete
+      // and each click has its own xpath.
+      // The xpaths are all stored in the same property and
+      // and separated by a single '&'
+      final String[] xpathInstructions = form.get(instructionsProperty).split("&");
+
       for (String instruction : xpathInstructions) {
-        // Concat innerTextToSelect with xpath method and try clicking on it
-        element = driver.findElement(By.xpath(instruction.replace("REPLACE", user.get(innerTextToSelect)))); // idek what this does and i wrote it
+        /*
+        Replace 'REPLACE' keyword variable from user.properties
+
+        This can be confusing :(
+        In the adidas.properties file, some xpaths I have included
+        'REPLACE'
+
+        This line will get the edit the xpath by replacing the 'REPLACE'
+        keyword with the innerHTML necessary.
+
+        Ex:
+          Your card expires in 2017 and the xpath of the dropdown element is:
+          //span[text()[contains(.,'REPLACE')]]
+
+          The 'REPLACE' will get replaced with '2017' which will evaluate
+          into a real HTML element within the DOM.
+
+        */
+        element = driver.findElement(By.xpath(instruction.replace("REPLACE", user.get(innerTextToSelect))));
+
         try {
           element.click();
           System.out.println(instructionsProperty + " clicked");
@@ -167,7 +186,7 @@ class Purchaser {
         }
       }
     } else {
-      // If the form element is not a dropdown we can just simple click the element
+      // If the form element is not a dropdown we can just simply click the element
       driver.findElement(By.xpath(instructionsProperty)).click();
     }
   }
@@ -181,7 +200,6 @@ class Purchaser {
    * @param url url of shoe
    */
   private static void recordPurchase(String url) {
-    // Establish PrintWriter
     PrintWriter out = null;
     try {
       out = new PrintWriter(new BufferedWriter(new FileWriter(purchaseTxt, true)));
@@ -196,6 +214,7 @@ class Purchaser {
 
   /**
    * This method will exit the while loop
+   * (keep trying until the shoe is copped)
    *
    * @param url url of the shoe
    * @return whether the shoe url has been written to the file
@@ -210,7 +229,7 @@ class Purchaser {
         System.out.println("inline = " + inline);
 
         if (inline.equals(url)) {
-          // A match was found meaning the user already purcahses
+          // A match was found meaning the user already purchased
           System.out.println("Shoe owned");
           return false;
         }
@@ -224,13 +243,17 @@ class Purchaser {
   }
 
   /**
-   * Checks if a reCaptcha exists on the webpage
+   * Checks if a reCaptcha exists in the DOM
    * if there is a captcha it will wait until the
    * user to solve it and user input
+   *
+   * TODO: Improve captcha identification
    */
   private static void captcha() {
     try {
       System.out.println("\nChecking for captcha...");
+
+      // Captcha is very difficult to identify however I've had the most success with this xpath
       if (!driver.findElements(By.xpath(form.get("Captcha"))).isEmpty()) {
         // Element exists
         System.out.println("Captcha found!");
@@ -247,6 +270,17 @@ class Purchaser {
       }
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  /**
+   * Adidas will occasionally prompt login if the user is a guest
+   * this will click the button to proceed to checkout as a guest
+   */
+  private static void proceedAsGuest() {
+    // If they prompt login
+    if (driver.getCurrentUrl().equals("https://www.adidas.com/us/checkout-start")) {
+      driver.findElement(By.xpath("//*[@id=\"frameContainer\"]/div[2]/form/div/button")).click(); // sketchy
     }
   }
 }

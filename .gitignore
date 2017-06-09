@@ -28,5 +28,6 @@ hs_err_pid*
 .idea/workspace.xml
 src/test/
 target/
+!/src/main/resources/user.properties
 !/src/main/resources/adidas.properties
 !/src/main/resources/log4j.properties

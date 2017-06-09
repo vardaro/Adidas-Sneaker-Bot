@@ -18,11 +18,10 @@ public class Main {
 
   public static void main(String[] args) {
     // Establish ChromeDriver executable in properties
-    System.setProperty("webdriver.chrome.driver", "C:\\Users\\justa\\Downloads\\chromedriver_win32\\chromedriver.exe");
+    System.setProperty("webdriver.chrome.driver", "chrome_driver/chromedriver.exe");
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
       System.out.println("Enter link into console below");
-
       Purchaser.buyShoe(br.readLine());
     } catch (Exception e) {
       e.printStackTrace();

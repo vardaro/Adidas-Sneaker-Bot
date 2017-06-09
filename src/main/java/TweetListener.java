@@ -1,8 +1,3 @@
-import org.apache.xpath.operations.Bool;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import twitter4j.*;
 
 import java.io.BufferedWriter;
@@ -16,7 +11,7 @@ import java.io.PrintWriter;
  * specified twitter accounts for restock and release announcement
  */
 public class TweetListener {
-  private static final String adidasalerts = "C:\\Users\\justa\\IdeaProjects\\SneakerBot\\Tweets\\adidasalerts.txt";
+  private static final String adidasalerts = "Tweets/adidasalerts.txt";
   PropertiesReader user = new PropertiesReader("user.properties");
 
   Boolean checkoutPermitted = Boolean.parseBoolean(user.get("CheckoutPermitted"));
@@ -27,7 +22,7 @@ public class TweetListener {
    *
    * @return Twitter object containing API keys
    */
-  private static Twitter getTwitter() {
+  public static Twitter getTwitter() {
     return new TwitterFactory().getSingleton();
   }
 
@@ -38,7 +33,6 @@ public class TweetListener {
    * @param s Tweet found
    */
   private static void printTweetInfo(Status s) {
-    //System.out.println("\nNew @" + s.getUser().getScreenName() + " tweet found!");
     System.out.println("Date Tweeted: " + s.getCreatedAt());
     System.out.println("Tweet ID: " + s.getId());
     System.out.println("Body: {\n" + s.getText() + "\n}");
@@ -82,17 +76,17 @@ public class TweetListener {
    * TODO: Finish tweet listener and add support for shoe value logic
    *
    * @param username          Twitter users @
-   * @param twitter           Twitter object
    * @param checkoutPermitted if true, will purchase the shoe, otherwise it just prints the tweet and moves on
    */
-  private static void StartListening(final String username, Twitter twitter, final boolean checkoutPermitted) {
+  public static void StartListening(final String username, final boolean checkoutPermitted) {
     try {
+      Twitter twitter = getTwitter();
       User user = twitter.showUser(username);
       // Declaring TwitterStream object
       TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
 
       final StatusListener listener = new StatusListener() {
-        //Declaring each method
+        // defining each status
         public void onStatus(Status status) {
           // Immediately filter out retweets and replies
           if (status.getUser().getScreenName().equals(username)) {
@@ -102,19 +96,10 @@ public class TweetListener {
 
             if (checkoutPermitted) {
               String link = extractLink(status);
-
+              Purchaser.buyShoe(link);
               recordTweet(status);
 
             }
-            // Creating new instance of ChromeDriver()
-            WebDriver driver = new ChromeDriver();
-
-            // Visit website
-            driver.get("http://google.com");
-            WebElement element = driver.findElement(By.name("q"));
-            element.sendKeys("Anthony Vardaro");
-            element.submit();
-
           }
         }
 
